@@ -45,7 +45,7 @@ Guía completa end-to-end (instalación, escenarios tarea/plan, `--auto`/`--conf
 
 **Etapa B (plugin):** instalar desde el repo público y ejecutar en Claude Code:
 ```
-/plugin marketplace add <tu-usuario>/effort-router
+/plugin marketplace add GonzaloTudela/effort-router
 /plugin install effort-router@effort-router-marketplace
 /effort-router:effort-router [--auto|--confirm] <fichero|fragmento|plan>
 ```

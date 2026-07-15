@@ -146,7 +146,7 @@ return { mapa, results }
 Esta skill es parte del plugin `effort-router`, auto-descubierta en `skills/effort-router/SKILL.md`. Instalar desde el repo público:
 
 ```
-/plugin marketplace add <tu-usuario>/effort-router
+/plugin marketplace add GonzaloTudela/effort-router
 /plugin install effort-router@effort-router-marketplace
 ```
 

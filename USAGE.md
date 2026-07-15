@@ -53,7 +53,7 @@ Objetivo: comprobar que el clasificador acierta antes de construir sobre él.
 ### Instalar (desde el repo público)
 
 ```
-/plugin marketplace add <tu-usuario>/effort-router
+/plugin marketplace add GonzaloTudela/effort-router
 /plugin install effort-router@effort-router-marketplace
 ```
 

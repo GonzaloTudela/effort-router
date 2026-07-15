@@ -3,6 +3,8 @@
   "description": "Clasifica una tarea o plan por complejidad/acoplamiento y enruta el par (effort, modelo) despachando el trabajo a subagentes tierizados. Capable-first (prefiere Opus en tareas complejas), circuit breaker para codigo entrelazado, puerta de contexto (Haiku 200K vs modelos 1M). Optimiza calidad > velocidad > coste.",
   "version": "0.2.0",
   "author": { "name": "Gonzalo Tudela" },
+  "homepage": "https://github.com/GonzaloTudela/effort-router",
+  "repository": "https://github.com/GonzaloTudela/effort-router",
   "license": "MIT",
   "keywords": ["effort", "router", "model-selection", "cost-optimization", "subagents", "capable-first", "php-to-rust", "migration"]
 }
