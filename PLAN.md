@@ -78,10 +78,11 @@ reasons:            [string]
 
 ---
 
-## Etapa B — Skill `effort-router`
+## Etapa B — Plugin `effort-router`
 
-**Fuente en repo:** `B-skill/SKILL.md`. **Instalación:** copiar/symlink a `~/.claude/skills/effort-router/`.
-**Invocación:** `/effort-router [--auto|--confirm] <fichero|fragmento|plan>`.
+**Layout:** plugin de Claude Code — `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` en la raíz; skill auto-descubierta en `skills/effort-router/SKILL.md`.
+**Instalación:** `/plugin marketplace add <usuario>/effort-router` → `/plugin install effort-router@effort-router-marketplace`.
+**Invocación:** `/effort-router:effort-router [--auto|--confirm] <fichero|fragmento|plan>`.
 
 ### Palanca de despacho (todo dentro de Claude Code, sin API key ni script)
 - **Critic:** agente **Haiku** vía Workflow `agent(clasificaPrompt, {model:"haiku", schema: DECISION_SCHEMA})` — **sin `effort`**, sin thinking. Devuelve la decisión validada.
@@ -114,14 +115,17 @@ entrada (tarea | plan)
 ## Estructura del proyecto
 
 ```
-abn-effort-router/
-  PLAN.md
+effort-router/            ← repo público = plugin + marketplace
+  .claude-plugin/
+    plugin.json            ← manifest del plugin
+    marketplace.json       ← catálogo (/plugin marketplace add)
+  skills/
+    effort-router/
+      SKILL.md             ← skill auto-descubierta
   A-prompt/
     classifier.md          ← rúbrica + CLASSIFIER_SYSTEM_PROMPT + DECISION_SCHEMA + uso
     fixtures/              ← score1_pure.php, score4_wpquery.php, score5_globals.php (+ .expected.json)
-  B-skill/
-    SKILL.md               ← skill /effort-router (fuente; instalar a ~/.claude/skills/effort-router/)
-  README.md
+  PLAN.md · README.md · USAGE.md · LICENSE
   (C-analyzer/            ← futuro, Rust)
 ```
 

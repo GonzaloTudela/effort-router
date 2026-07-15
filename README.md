@@ -25,11 +25,15 @@ Rúbrica score → `(effort, modelo)`:
 ## Estructura
 
 ```
+.claude-plugin/
+  plugin.json            manifest del plugin effort-router
+  marketplace.json       catálogo (permite /plugin marketplace add)
+skills/
+  effort-router/
+    SKILL.md             la skill (auto-descubierta por el plugin)
 A-prompt/
   classifier.md          rúbrica + CLASSIFIER_SYSTEM_PROMPT + DECISION_SCHEMA + uso
   fixtures/              score{1,4,5}_*.php + *.expected.json (gold de validación)
-B-skill/
-  SKILL.md               skill /effort-router (fuente; instalar a ~/.claude/skills/)
 PLAN.md                  plan completo (A→B→C)
 ```
 
@@ -39,10 +43,11 @@ Guía completa end-to-end (instalación, escenarios tarea/plan, `--auto`/`--conf
 
 **Etapa A (validar la rúbrica):** clasificar los fixtures con Haiku y comparar contra los `*.expected.json`. Ver `A-prompt/classifier.md` §4-5.
 
-**Etapa B (skill):** instalar y ejecutar dentro de Claude Code:
+**Etapa B (plugin):** instalar desde el repo público y ejecutar en Claude Code:
 ```
-cp B-skill/SKILL.md ~/.claude/skills/effort-router/SKILL.md
-/effort-router [--auto|--confirm] <fichero|fragmento|plan>
+/plugin marketplace add <tu-usuario>/effort-router
+/plugin install effort-router@effort-router-marketplace
+/effort-router:effort-router [--auto|--confirm] <fichero|fragmento|plan>
 ```
 - `--confirm` (default): muestra la decisión, aprobar antes de despachar.
 - `--auto`: despacha directo al tier recomendado.
@@ -50,5 +55,5 @@ cp B-skill/SKILL.md ~/.claude/skills/effort-router/SKILL.md
 ## Estado
 
 - [x] Etapa A — activo reutilizable (rúbrica, prompt, schema, fixtures).
-- [x] Etapa B — skill `effort-router` (Critic Haiku → Actor tierizado, `--auto/--confirm`, tarea|plan, breaker).
+- [x] Etapa B — plugin `effort-router` (Critic Haiku → Actor tierizado, `--auto/--confirm`, tarea|plan, breaker).
 - [ ] Etapa C — analizador de repo entero en **Rust** (concurrencia, caché por hash, guión de effort). Diferida hasta validar B.

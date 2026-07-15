@@ -9,9 +9,11 @@ Enruta trabajo por complejidad: barato abajo, caro arriba. Un **Critic** barato 
 
 ## Invocación
 
+Como plugin, el comando lleva el namespace del plugin:
 ```
-/effort-router [--auto|--confirm] <fichero | fragmento pegado | plan multi-paso>
+/effort-router:effort-router [--auto|--confirm] <fichero | fragmento pegado | plan multi-paso>
 ```
+La skill también se activa por relevancia (sin barra) cuando el usuario pide "enrutar por effort", "elegir modelo y effort para esta tarea/plan", etc.
 
 - `--confirm` (por defecto): clasifica → muestra la decisión → el usuario aprueba/ajusta → despacha.
 - `--auto`: clasifica → despacha directo (lotes / desatendido).
@@ -139,11 +141,18 @@ return { mapa, results }
 - **Score 5 / `requires_human`** → breaker, nunca despachar.
 - El clasificador es el activo de `A-prompt/classifier.md` (fuente canónica de rúbrica, prompt y schema). Mantén este archivo en sincronía con él.
 
-## Instalación
+## Instalación (plugin de Claude Code)
 
-Fuente versionada en el repo (`B-skill/SKILL.md`). Para activarla globalmente:
+Esta skill es parte del plugin `effort-router`, auto-descubierta en `skills/effort-router/SKILL.md`. Instalar desde el repo público:
 
 ```
-cp B-skill/SKILL.md ~/.claude/skills/effort-router/SKILL.md
+/plugin marketplace add <tu-usuario>/effort-router
+/plugin install effort-router@effort-router-marketplace
 ```
-(o symlink). Reinicia/relee skills en Claude Code y ejecuta `/effort-router`.
+
+Desarrollo local (sin publicar), desde la raíz del repo:
+```
+/plugin marketplace add ./
+/plugin install effort-router@effort-router-marketplace
+```
+Tras instalar, invoca `/effort-router:effort-router` (o deja que se active por relevancia).

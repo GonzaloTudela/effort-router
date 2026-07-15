@@ -1,0 +1,12 @@
+{
+  "name": "effort-router-marketplace",
+  "owner": { "name": "Gonzalo Tudela" },
+  "description": "Marketplace de effort-router: enrutador de effort/modelo por complejidad para Claude Code.",
+  "plugins": [
+    {
+      "name": "effort-router",
+      "source": "./",
+      "description": "Clasifica y enruta el par (effort, modelo) por complejidad; capable-first, circuit breaker, entrada tarea o plan."
+    }
+  ]
+}

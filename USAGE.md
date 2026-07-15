@@ -48,22 +48,28 @@ Objetivo: comprobar que el clasificador acierta antes de construir sobre él.
 
 ---
 
-## Etapa B — la skill `/effort-router`
+## Etapa B — el plugin `effort-router`
 
-### Instalar
+### Instalar (desde el repo público)
 
-```bash
-# desde la raíz del repo
-mkdir -p ~/.claude/skills/effort-router
-cp B-skill/SKILL.md ~/.claude/skills/effort-router/SKILL.md
 ```
-Reinicia/relee skills en Claude Code. (En Windows con PowerShell: `New-Item -ItemType Directory -Force ~/.claude/skills/effort-router; Copy-Item B-skill/SKILL.md ~/.claude/skills/effort-router/SKILL.md`.)
+/plugin marketplace add <tu-usuario>/effort-router
+/plugin install effort-router@effort-router-marketplace
+```
+
+Desarrollo local (sin publicar), desde la raíz del repo:
+```
+/plugin marketplace add ./
+/plugin install effort-router@effort-router-marketplace
+```
+> `effort-router-marketplace` es el campo `name` de `.claude-plugin/marketplace.json` (no el nombre del repo). La skill se auto-descubre en `skills/effort-router/SKILL.md`.
 
 ### Invocar
 
 ```
-/effort-router [--auto|--confirm] <fichero | fragmento pegado | plan>
+/effort-router:effort-router [--auto|--confirm] <fichero | fragmento pegado | plan>
 ```
+(También se activa por relevancia sin barra.)
 
 ### Escenario 1 — una tarea, con confirmación (default)
 
