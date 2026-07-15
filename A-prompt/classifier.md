@@ -23,12 +23,22 @@ Contiene: **rúbrica**, **`CLASSIFIER_SYSTEM_PROMPT`**, **`DECISION_SCHEMA`** (j
 - El modelo **diagnostica** (score + par recomendado + `context_sensitivity`); el código/usuario **decide** si despacha.
 - **Haiku no acepta `effort`.** Cuando `recommended_model == "claude-haiku-4-5"`, `recommended_effort` es solo documental — el dispatcher lo omite en la llamada.
 
-### Solapamiento Opus/Sonnet por effort (razonado desde la referencia `claude-api`; pendiente de confirmar empíricamente)
+### Solapamiento Opus/Sonnet por effort (barrido empírico, v0.1.0)
 
-- Sonnet 5 en `high`/`xhigh` **solapa** con Opus 4.8 en `low`/`medium` en muchas tareas complejas-pero-acotadas, a ~60% del coste ($3/$15 vs $5/$25).
-- Opus 4.8 se despega en `high`/`xhigh` en trabajo **de horizonte largo** y en corrección/verificación de bugs.
-- Efecto no monótono: subir effort no siempre mejora; en Opus 4.8 conviene **partir de `high` y barrer**, reservar `max` para lo más duro (con aprobación).
-- **Política elegida (preferencia al capaz):** en la zona de solapamiento, **preferir Opus** y regular coste bajando su effort, no cambiando de modelo. Confirmar el punto exacto de solape con un barrido empírico (ver PLAN §Verificación).
+Tarea: migrar el `WP_Query` de `fixtures/score4_wpquery.php` a Rust async idiomático (repositorio + caché + tests). Juez ciego (Opus). Calidad /100:
+
+| | low | medium | high | xhigh | max |
+|---|---|---|---|---|---|
+| **Opus 4.8** | 91 | 88 | 88 | 91 | **95** |
+| **Sonnet 5** | — | 82 | 88 | 85 | 85 |
+
+Conclusiones:
+- **Opus domina todo el rango:** su suelo (88) = techo de Sonnet (88); **Opus·low (91) supera a Sonnet·xhigh y Sonnet·max (85)**. → capable-first confirmado.
+- **Solape a favor de Opus:** menos effort de Opus rinde más que más effort de Sonnet. La zona de solape (Sonnet·high 88 ≈ Opus·med/high 88) ya la cubre Opus·low.
+- **Opus casi insensible al effort en esta tarea** (low/xhigh 91, med/high 88; dentro del ruido del juez) → **Opus a `low`/`medium` es el punto dulce calidad/coste**; no hace falta `xhigh` salvo horizonte largo.
+- **`max` con rendimientos decrecientes:** Opus·max 95 vs xhigh 91 = +4 por ~3× tokens ($1.33 vs $0.42). Reservar `max` para lo más duro, con aprobación.
+
+**Política (capable-first):** en la zona de solape, preferir Opus y regular coste con su effort (partir de `medium`), no cambiar de modelo. *Caveat: la medición de coste falló en 3 celdas de Opus (delta `budget.spent()` = 0); la calidad es fiable, la curva de coste exacta requiere re-medir (leer `journal.jsonl` por agente o `count_tokens`).*
 
 ---
 
