@@ -1,0 +1,25 @@
+{
+  "complexity_score": 4,
+  "summary": "Consulta WP_Query con meta_query AND/NUMERIC, ordenación por meta y caché por transient; estado tras frontera pero ORM/caché no trivial.",
+  "dependencies": [
+    { "name": "WP_Query", "kind": "framework", "abstractability": "port" },
+    { "name": "get_transient/set_transient", "kind": "io", "abstractability": "port" },
+    { "name": "wp_list_pluck", "kind": "framework", "abstractability": "trivial" },
+    { "name": "HOUR_IN_SECONDS", "kind": "framework", "abstractability": "trivial" }
+  ],
+  "pure_inputs": ["limit:int"],
+  "pure_outputs": ["ids:array<int>"],
+  "invariants": [
+    "el orden ASC por _sale_price debe preservarse",
+    "la clave de caché depende de limit; no colisionar entre límites distintos",
+    "el TTL de una hora acota la frescura de los resultados"
+  ],
+  "context_sensitivity": "high",
+  "recommended_effort": "xhigh",
+  "recommended_model": "claude-opus-4-8",
+  "requires_human": false,
+  "reasons": [
+    "La meta_query con relación AND y comparador NUMERIC exige traducir semántica de consulta a SQL/ORM Rust con cuidado.",
+    "La capa de caché por transient introduce estado con TTL que debe replicarse tras una frontera de repositorio."
+  ]
+}

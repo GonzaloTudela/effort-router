@@ -1,0 +1,19 @@
+{
+  "complexity_score": 1,
+  "summary": "Funciones puras de transformación de string y formateo numérico; sin framework, sin I/O, sin estado global.",
+  "dependencies": [],
+  "pure_inputs": ["text:string", "cents:int"],
+  "pure_outputs": ["slug:string", "importe formateado:string"],
+  "invariants": [
+    "slugify es idempotente sobre su propia salida",
+    "el redondeo de céntimos no pierde precisión"
+  ],
+  "context_sensitivity": "low",
+  "recommended_effort": "low",
+  "recommended_model": "claude-haiku-4-5",
+  "requires_human": false,
+  "reasons": [
+    "Determinista y sin dependencias: entrada -> salida sin efectos.",
+    "Traducción directa a Rust (funciones puras)."
+  ]
+}

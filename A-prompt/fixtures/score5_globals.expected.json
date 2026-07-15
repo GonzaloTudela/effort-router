@@ -1,0 +1,27 @@
+{
+  "complexity_score": 5,
+  "summary": "Global mutable ($theme_state, $GLOBALS) + output buffering + hooks con side-effects ocultos cuyo orden determina el HTML; reentrada dependiente de contador global. Entrelazado sin frontera.",
+  "dependencies": [
+    { "name": "$theme_state (global mutable)", "kind": "global", "abstractability": "entangled" },
+    { "name": "$GLOBALS['rendered_shell']", "kind": "global", "abstractability": "entangled" },
+    { "name": "ob_start/ob_get_clean", "kind": "io", "abstractability": "entangled" },
+    { "name": "do_action/apply_filters", "kind": "framework", "abstractability": "entangled" },
+    { "name": "$wp_query", "kind": "global", "abstractability": "port" }
+  ],
+  "pure_inputs": [],
+  "pure_outputs": [],
+  "invariants": [
+    "el orden de disparo de los hooks determina el HTML final",
+    "el contador de profundidad ($theme_state['depth']) controla la reentrada y no puede desincronizarse",
+    "la acumulación en $GLOBALS['rendered_shell'] preserva el HTML entre llamadas"
+  ],
+  "context_sensitivity": "high",
+  "recommended_effort": "low",
+  "recommended_model": "claude-haiku-4-5",
+  "requires_human": true,
+  "reasons": [
+    "Múltiples dependencias 'entangled': global mutable con orden de ejecución implícito y side-effects en hooks.",
+    "Output buffering + reentrada dependiente de estado global no tienen equivalente Rust seguro sin rediseño (Anti-Corruption Layer).",
+    "CIRCUIT BREAKER: no auto-procesar; requiere decisión humana."
+  ]
+}

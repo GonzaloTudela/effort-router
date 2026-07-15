@@ -1,0 +1,16 @@
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp / scratch
+scratchpad/
+*.log
+tmp/
+
+# Rust (Etapa C, futuro)
+/C-analyzer/target/
