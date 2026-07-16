@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/calibration-results.schema.json",
+  "title": "Calibration result set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "dataset_version", "split", "versions", "records"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "dataset_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "split": { "type": "string", "enum": ["calibration", "retained"] },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt", "policy", "model_catalog", "analyzer"],
+      "properties": {
+        "prompt": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "policy": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "model_catalog": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "analyzer": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id", "feature_key", "model", "effort", "attempts", "successes",
+          "median_latency_ms", "median_cost_units"
+        ],
+        "properties": {
+          "case_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "feature_key": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "effort": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              { "type": "null" }
+            ]
+          },
+          "attempts": { "type": "integer", "minimum": 1 },
+          "successes": { "type": "integer", "minimum": 0 },
+          "median_latency_ms": { "type": ["number", "null"], "minimum": 0 },
+          "median_cost_units": { "type": ["number", "null"], "minimum": 0 }
+        }
+      }
+    }
+  }
+}

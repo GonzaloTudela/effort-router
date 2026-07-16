@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/effect-rules.schema.json",
+  "title": "Effect rule catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "language", "framework", "rules"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "catalog_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "language": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "framework": {
+      "anyOf": [
+        { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        { "type": "null" }
+      ]
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "matcher", "effects", "state_scope", "state_access", "description"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "matcher": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_kind", "match", "pattern"],
+            "properties": {
+              "node_kind": {
+                "type": "string",
+                "enum": ["call", "constructor", "method_call", "language_construct", "class_reference"]
+              },
+              "match": { "type": "string", "enum": ["exact", "regex"] },
+              "pattern": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+            }
+          },
+          "effects": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/effectKind" },
+            "uniqueItems": true
+          },
+          "state_scope": {
+            "type": ["string", "null"],
+            "enum": ["local", "property", "static", "global", "external", null]
+          },
+          "state_access": {
+            "type": ["string", "null"],
+            "enum": ["read", "write", "read_write", null]
+          },
+          "resource": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              { "type": "null" }
+            ]
+          },
+          "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+        }
+      }
+    }
+  }
+}

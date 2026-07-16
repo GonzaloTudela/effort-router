@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/model-catalog.schema.json",
+  "title": "Model capability catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "source", "verified_at", "models"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "catalog_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "source": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "verified_at": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "workflow_alias", "context_window", "supported_efforts", "capabilities",
+          "capability_rank", "cost_rank", "latency_rank", "approval_required", "enabled"
+        ],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "workflow_alias": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "context_window": { "type": "integer", "minimum": 1 },
+          "supported_efforts": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "anyOf": [
+                { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                { "type": "null" }
+              ]
+            },
+            "uniqueItems": true
+          },
+          "capabilities": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/capability" },
+            "uniqueItems": true
+          },
+          "capability_rank": { "type": "integer", "minimum": 1 },
+          "cost_rank": { "type": "integer", "minimum": 1 },
+          "latency_rank": { "type": "integer", "minimum": 1 },
+          "approval_required": { "type": "boolean" },
+          "enabled": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

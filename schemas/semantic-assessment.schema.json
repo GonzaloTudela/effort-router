@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/semantic-assessment.schema.json",
+  "title": "SemanticAssessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "assessment_id",
+    "task_id",
+    "normalized_task",
+    "ambiguities",
+    "invariants",
+    "semantic_risks",
+    "required_capabilities",
+    "required_context",
+    "confidence",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "assessment_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "task_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "normalized_task": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "description", "material", "required_context"],
+        "properties": {
+          "field": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "material": { "type": "boolean" },
+          "required_context": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "invariants": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "semantic_risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "description", "evidence_refs"],
+        "properties": {
+          "kind": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "required_capabilities": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/capability" },
+      "uniqueItems": true
+    },
+    "required_context": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reference", "reason", "required"],
+        "properties": {
+          "reference": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "reason": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "task_interpretation", "code_alignment"],
+      "properties": {
+        "overall": { "$ref": "common.schema.json#/$defs/confidence" },
+        "task_interpretation": { "$ref": "common.schema.json#/$defs/confidence" },
+        "code_alignment": { "$ref": "common.schema.json#/$defs/confidence" }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "statement", "evidence_ref", "rationale", "static_check"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "kind": {
+            "type": "string",
+            "enum": ["requirement", "invariant", "risk", "context", "capability", "code_interpretation"]
+          },
+          "statement": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "evidence_ref": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              { "type": "null" }
+            ]
+          },
+          "rationale": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "static_check": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["kind", "subject", "expected"],
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": ["effect_presence", "call_resolution", "state_access_presence", "coverage_bounded", "symbol_presence"]
+                  },
+                  "subject": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                  "expected": { "type": "boolean" }
+                }
+              },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

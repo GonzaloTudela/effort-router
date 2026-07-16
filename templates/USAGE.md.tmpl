@@ -1,0 +1,80 @@
+# Uso de abn-effort-router
+
+<!-- Generado por scripts/generate.mjs. No editar directamente. -->
+
+## Instalación
+
+```text
+/plugin marketplace add GonzaloTudela/effort-router
+/plugin install effort-router@effort-router-marketplace
+```
+
+Desarrollo local desde la raíz:
+
+```text
+/plugin marketplace add ./
+/plugin install effort-router@effort-router-marketplace
+```
+
+El plugin requiere Node `{{NODE_REQUIREMENT}}`. No requiere Anthropic SDK ni una API key adicional.
+
+## Entradas
+
+Prosa con confirmación:
+
+```text
+/effort-router:effort-router --confirm "Corrige calculate() en src/Price.php y conserva redondeo y API pública"
+```
+
+Contrato reproducible:
+
+```text
+/effort-router:effort-router --spec tasks/price-fix.json
+```
+
+Automático:
+
+```text
+/effort-router:effort-router --auto --spec tasks/price-fix.json
+```
+
+Un `TaskProfile` declara operación, targets, superficie, restricciones, aceptación, contexto, dependencias, conflictos y objetivo de calidad. Si faltan campos materiales, la acción será `request_task_contract`.
+
+## Qué muestra
+
+Antes de despachar, el router presenta:
+
+- símbolos, archivos, llamadas, estado y efectos incluidos en el slice;
+- cobertura de parseo/resolución y construcciones dinámicas;
+- invariantes, riesgos, confianza y claims del Critic con evidencia;
+- discrepancias y guardas activadas;
+- candidatos descartados y motivos;
+- tamaño de muestra, límite conservador y versiones;
+- acción y candidato final, si existe.
+
+No existe un score único. Cambiar `change_surface` puede cambiar callers, recursos, radio de impacto y ruta aunque el archivo sea el mismo.
+
+## Acciones
+
+- `dispatch`: candidato viable; en `--confirm` requiere aceptación del usuario.
+- `request_context`: faltan archivos, resolución o límites del slice.
+- `request_task_contract`: el contrato no define lo necesario.
+- `escalate_critic`: confianza baja o claims sin evidencia válida.
+- `human_review`: desacuerdo material, efecto dinámico, capacidad/aprobación ausente o calibración insuficiente en `--auto`.
+
+## Planes
+
+Cada paso debe ser un `TaskProfile`. El router construye un DAG con dependencias declaradas y conflictos derivados de archivos, símbolos, recursos y `conflict_keys`. Solo una ola independiente se ejecuta en paralelo. Un bloqueo detiene dependientes, no ramas independientes.
+
+## Comandos locales de desarrollo
+
+```text
+node dist/analyzer.mjs version
+node dist/analyzer.mjs analyze --root . --spec task.json
+npm test
+npm run verify
+npm run generate:check
+npm run build:check
+```
+
+Los comandos `route`, `plan`, `actor-payload`, `record` y `metrics` reciben JSON por stdin para evitar argumentos con código o secretos. `record --output ruta.jsonl` guarda hashes, versiones y resultados; nunca fuente. `metrics` publica tamaño de muestra, límite conservador, correcciones, violaciones de alcance y latencia.

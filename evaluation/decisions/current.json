@@ -1,0 +1,22 @@
+{
+  "benchmark": "evaluation\\benchmarks\\local-baseline.json",
+  "gates_version": "1.0.0",
+  "prompt_policy_promotion": {
+    "approved": false,
+    "reasons": [
+      "insufficient_retained_samples"
+    ]
+  },
+  "retained_dataset": "bootstrap-retained-1.0.0",
+  "rust": {
+    "approved": false,
+    "reasons": [
+      "insufficient_profiled_repositories",
+      "insufficient_profiled_php_files",
+      "analyzer_not_proven_bottleneck",
+      "required_speedup_not_measured",
+      "byte_compatibility_not_proven"
+    ]
+  },
+  "schema_version": "1.0.0"
+}

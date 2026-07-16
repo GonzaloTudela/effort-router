@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/metrics-report.schema.json",
+  "title": "Execution metrics report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "dataset_version", "split", "generated_at", "total_records", "routes"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "dataset_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "split": { "type": "string", "enum": ["calibration", "retained"] },
+    "generated_at": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "total_records": { "type": "integer", "minimum": 0 },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "model", "effort", "sample_size", "successes", "success_rate", "success_lower_bound",
+          "correction_rate", "scope_violation_rate", "median_latency_ms"
+        ],
+        "properties": {
+          "model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "effort": {
+            "anyOf": [{ "$ref": "common.schema.json#/$defs/nonEmptyString" }, { "type": "null" }]
+          },
+          "sample_size": { "type": "integer", "minimum": 1 },
+          "successes": { "type": "integer", "minimum": 0 },
+          "success_rate": { "$ref": "common.schema.json#/$defs/confidence" },
+          "success_lower_bound": { "$ref": "common.schema.json#/$defs/confidence" },
+          "correction_rate": { "$ref": "common.schema.json#/$defs/confidence" },
+          "scope_violation_rate": { "$ref": "common.schema.json#/$defs/confidence" },
+          "median_latency_ms": { "type": ["number", "null"], "minimum": 0 }
+        }
+      }
+    }
+  }
+}

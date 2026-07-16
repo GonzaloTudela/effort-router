@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/fixture-expectation.schema.json",
+  "title": "Static and semantic fixture expectation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source", "task", "expected_static", "expected_semantic", "ignored_source_kinds"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "source": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "task": { "$ref": "task-profile.schema.json" },
+    "expected_static": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["symbols", "calls", "effect_kinds", "state_accesses", "evidence_rule_ids", "forbidden_effect_kinds"],
+      "properties": {
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "kind"],
+            "properties": {
+              "name": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "kind": { "type": "string", "enum": ["function", "method", "class", "interface", "trait", "closure", "file"] }
+            }
+          }
+        },
+        "calls": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "effect_kinds": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/effectKind" },
+          "uniqueItems": true
+        },
+        "state_accesses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["subject", "scope", "access"],
+            "properties": {
+              "subject": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "scope": { "type": "string", "enum": ["local", "property", "static", "global", "external"] },
+              "access": { "type": "string", "enum": ["read", "write", "read_write"] }
+            }
+          }
+        },
+        "evidence_rule_ids": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "forbidden_effect_kinds": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/effectKind" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "expected_semantic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invariants", "risk_kinds", "required_capabilities"],
+      "properties": {
+        "invariants": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "risk_kinds": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "required_capabilities": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/capability" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ignored_source_kinds": {
+      "type": "array",
+      "contains": { "const": "comment" },
+      "items": { "type": "string", "enum": ["comment", "string_literal", "identifier_name"] },
+      "uniqueItems": true
+    }
+  }
+}

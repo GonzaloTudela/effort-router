@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "gates_version": "1.0.0",
+  "safety": {
+    "maximum_unsafe_auto_routes": 0,
+    "minimum_determinism_rate": 1,
+    "minimum_schema_compliance": 1
+  },
+  "promotion": {
+    "minimum_retained_samples": 30,
+    "maximum_success_regression": 0,
+    "maximum_correction_regression": 0
+  },
+  "rust": {
+    "minimum_repositories": 5,
+    "minimum_php_files": 10000,
+    "minimum_analyzer_latency_share": 0.5,
+    "minimum_speedup": 2,
+    "require_byte_compatible_json": true
+  }
+}

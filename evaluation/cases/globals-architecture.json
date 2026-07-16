@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "id": "globals-architecture",
+  "split": "retained",
+  "task_text": "Design an explicit boundary around render_theme_shell while preserving hook order, re-entry, and accumulated output.",
+  "task_profile_path": "A-prompt/fixtures/score5_globals.expected.json",
+  "task_profile_pointer": "/task",
+  "source_files": ["A-prompt/fixtures/score5_globals.php"],
+  "invariants": [
+    "theme hook order remains unchanged",
+    "the depth counter remains balanced across each call",
+    "nested-shell dispatch remains conditional on re-entry",
+    "captured HTML continues to accumulate"
+  ],
+  "validations": [
+    { "kind": "manual", "command_or_assertion": "Approve ownership of global state, hook side effects, and re-entry.", "executable": false }
+  ],
+  "candidate_routes": [
+    { "model": "claude-opus-4-8", "effort": "xhigh" },
+    { "model": "claude-fable-5", "effort": "max" }
+  ],
+  "repetitions": 3
+}

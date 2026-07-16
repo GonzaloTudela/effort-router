@@ -1,0 +1,35 @@
+# Estado y evolución de abn-effort-router
+
+<!-- Generado por scripts/generate.mjs. No editar directamente. -->
+
+## Entregado en `{{PACKAGE_VERSION}}`
+
+- Contratos separados para tarea, código, evaluación semántica, coincidencia y decisión.
+- Critic en dos etapas sin recomendación de modelo, `effort` ni score.
+- Adaptador PHP con IR, símbolos, llamadas, estado, efectos, tests y cobertura.
+- Slices distintos para cuerpo, firma, callers, contrato de datos y arquitectura.
+- Reconciliación con procedencia, claims sin evidencia y discrepancias materiales.
+- Catálogo de capacidades y guardas versionadas.
+- Selector por límite conservador, objetivo de calidad y después latencia/coste.
+- Bootstrap conservador: sin muestra, automático no experimenta.
+- Bundle Node reproducible con parser incluido.
+- DAG de planes con conflictos y propagación de blockers.
+- Corpus separado de calibración y retención; Critic y Actor se miden por separado.
+- Registros de ejecución con hashes, versiones, aceptación, correcciones, latencia y uso; sin fuente ni secretos.
+- Métricas con tamaño de muestra e intervalo conservador.
+- CI para contratos, determinismo, Critic grabado, análisis, router, bundle, Workflow simulado y DAG.
+- Puertas objetivas de promoción y Rust.
+
+## Evidencia pendiente
+
+- La muestra real de calibración y retención sigue en cero; ninguna ruta barata puede promoverse con ese bootstrap.
+- El perfil local cubre un repositorio y tres fixtures PHP; no representa repositorios reales suficientes.
+- Se necesitan ejecuciones reales y perfiles adicionales antes de promover prompt, política, adaptadores o runtime.
+
+## Puerta para Rust
+
+Rust no se inicia por intuición. Requiere demostrar que parseo, grafo o hashing dominan la latencia en repositorios reales y que una implementación alternativa produce JSON byte-compatible con el bundle Node. Hasta entonces, el runtime soportado es Node `{{NODE_REQUIREMENT}}` con analizador `{{ANALYZER_VERSION}}`.
+
+La decisión actual en `evaluation/decisions/current.json` es **no-go** tanto para promoción como para Rust: faltan muestras retenidas, volumen de repositorios, prueba de cuello de botella, speedup y compatibilidad byte a byte.
+
+Los datos normativos viven en `schemas/`, `policy/`, `rules/` y `evaluation/`; este documento no replica tablas de modelos ni umbrales.

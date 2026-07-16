@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/router-policy.schema.json",
+  "title": "Deterministic router policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "policy_version", "critic", "confidence", "coverage",
+    "calibration", "context_safety_ratio"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "policy_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "critic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_model", "escalation_model", "max_attempts"],
+      "properties": {
+        "default_model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "escalation_model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "max_attempts": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confirm_minimum", "auto_minimum"],
+      "properties": {
+        "confirm_minimum": { "$ref": "common.schema.json#/$defs/confidence" },
+        "auto_minimum": { "$ref": "common.schema.json#/$defs/confidence" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confirm_resolved_call_ratio", "auto_resolved_call_ratio", "parsed_file_ratio"],
+      "properties": {
+        "confirm_resolved_call_ratio": { "$ref": "common.schema.json#/$defs/confidence" },
+        "auto_resolved_call_ratio": { "$ref": "common.schema.json#/$defs/confidence" },
+        "parsed_file_ratio": { "$ref": "common.schema.json#/$defs/confidence" }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum_comparable_samples", "wilson_z"],
+      "properties": {
+        "minimum_comparable_samples": { "type": "integer", "minimum": 1 },
+        "wilson_z": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "context_safety_ratio": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+  }
+}

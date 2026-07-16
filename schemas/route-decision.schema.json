@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/route-decision.schema.json",
+  "title": "RouteDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "decision_id", "task_id", "match_id", "mode", "action", "selected_candidate",
+    "required_context", "guard_results", "rejected_candidates", "calibration", "trigger_evidence_refs", "versions"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "decision_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "task_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "match_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "mode": { "type": "string", "enum": ["auto", "confirm"] },
+    "action": {
+      "type": "string",
+      "enum": ["dispatch", "request_context", "request_task_contract", "escalate_critic", "human_review"]
+    },
+    "selected_candidate": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model", "effort", "context_window", "cost_rank", "latency_rank", "evidence_refs"],
+          "properties": {
+            "model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            "effort": {
+              "anyOf": [
+                { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                { "type": "null" }
+              ]
+            },
+            "context_window": { "type": "integer", "minimum": 1 },
+            "cost_rank": { "type": "integer", "minimum": 1 },
+            "latency_rank": { "type": "integer", "minimum": 1 },
+            "evidence_refs": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "uniqueItems": true
+            }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "required_context": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "guard_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["guard", "outcome", "reason", "evidence_refs"],
+        "properties": {
+          "guard": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "outcome": { "type": "string", "enum": ["pass", "block_auto", "block_dispatch"] },
+          "reason": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "rejected_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model", "effort", "reasons"],
+        "properties": {
+          "model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "effort": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              { "type": "null" }
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dataset_version", "comparable_sample_size", "success_lower_bound", "quality_target"],
+      "properties": {
+        "dataset_version": {
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            { "type": "null" }
+          ]
+        },
+        "comparable_sample_size": { "type": "integer", "minimum": 0 },
+        "success_lower_bound": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "quality_target": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "trigger_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt", "task_schema", "code_schema", "semantic_schema", "match_schema", "route_schema", "policy", "model_catalog", "analyzer"],
+      "properties": {
+        "prompt": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "task_schema": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "code_schema": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "semantic_schema": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "match_schema": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "route_schema": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "policy": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "model_catalog": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "analyzer": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "action": { "const": "dispatch" } },
+        "required": ["action"]
+      },
+      "then": {
+        "properties": { "selected_candidate": { "type": "object" } }
+      },
+      "else": {
+        "properties": { "selected_candidate": { "type": "null" } }
+      }
+    }
+  ]
+}

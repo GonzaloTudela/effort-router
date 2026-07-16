@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "language": "php",
+  "framework": "laravel",
+  "rules": [
+    {
+      "id": "laravel.db-read",
+      "matcher": { "node_kind": "method_call", "match": "regex", "pattern": "^DB::(select|scalar)$" },
+      "effects": ["database_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "laravel:database",
+      "description": "Runs a direct Laravel database read."
+    },
+    {
+      "id": "laravel.db-write",
+      "matcher": { "node_kind": "method_call", "match": "regex", "pattern": "^DB::(insert|update|delete|statement)$" },
+      "effects": ["database_write"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "laravel:database",
+      "description": "Runs a direct Laravel database mutation."
+    },
+    {
+      "id": "laravel.cache-read",
+      "matcher": { "node_kind": "method_call", "match": "regex", "pattern": "^Cache::(get|many|remember|rememberForever)$" },
+      "effects": ["cache_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "laravel:cache",
+      "description": "Reads from Laravel cache; remember operations may additionally write on a miss."
+    },
+    {
+      "id": "laravel.cache-write",
+      "matcher": { "node_kind": "method_call", "match": "regex", "pattern": "^Cache::(put|add|forever|forget|flush)$" },
+      "effects": ["cache_write"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "laravel:cache",
+      "description": "Mutates Laravel cache state."
+    },
+    {
+      "id": "laravel.event-dispatch",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "event" },
+      "effects": ["event_dispatch"],
+      "state_scope": "external",
+      "state_access": "read_write",
+      "resource": "laravel:events",
+      "description": "Dispatches a Laravel event to runtime listeners."
+    }
+  ]
+}

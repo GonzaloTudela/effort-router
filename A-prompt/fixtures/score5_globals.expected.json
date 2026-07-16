@@ -1,27 +1,65 @@
 {
-  "complexity_score": 5,
-  "summary": "Global mutable ($theme_state, $GLOBALS) + output buffering + hooks con side-effects ocultos cuyo orden determina el HTML; reentrada dependiente de contador global. Entrelazado sin frontera.",
-  "dependencies": [
-    { "name": "$theme_state (global mutable)", "kind": "global", "abstractability": "entangled" },
-    { "name": "$GLOBALS['rendered_shell']", "kind": "global", "abstractability": "entangled" },
-    { "name": "ob_start/ob_get_clean", "kind": "io", "abstractability": "entangled" },
-    { "name": "do_action/apply_filters", "kind": "framework", "abstractability": "entangled" },
-    { "name": "$wp_query", "kind": "global", "abstractability": "port" }
-  ],
-  "pure_inputs": [],
-  "pure_outputs": [],
-  "invariants": [
-    "el orden de disparo de los hooks determina el HTML final",
-    "el contador de profundidad ($theme_state['depth']) controla la reentrada y no puede desincronizarse",
-    "la acumulación en $GLOBALS['rendered_shell'] preserva el HTML entre llamadas"
-  ],
-  "context_sensitivity": "high",
-  "recommended_effort": "low",
-  "recommended_model": "claude-haiku-4-5",
-  "requires_human": true,
-  "reasons": [
-    "Múltiples dependencias 'entangled': global mutable con orden de ejecución implícito y side-effects en hooks.",
-    "Output buffering + reentrada dependiente de estado global no tienen equivalente Rust seguro sin rediseño (Anti-Corruption Layer).",
-    "CIRCUIT BREAKER: no auto-procesar; requiere decisión humana."
-  ]
+  "schema_version": "1.0.0",
+  "source": "A-prompt/fixtures/score5_globals.php",
+  "task": {
+    "schema_version": "1.0.0",
+    "id": "fixture-global-architecture",
+    "contract_status": "complete",
+    "missing_fields": [],
+    "operation": "refactor",
+    "description": "Design an explicit boundary around render_theme_shell while preserving hook order, re-entry, and accumulated output.",
+    "targets": [
+      { "path": "A-prompt/fixtures/score5_globals.php", "symbol": "render_theme_shell" }
+    ],
+    "change_surface": "architecture",
+    "constraints": [
+      { "kind": "ordering", "subject": "theme hooks", "expected": "preserve dispatch order" },
+      { "kind": "reentry", "subject": "theme shell depth", "expected": "preserve nested-shell behavior" },
+      { "kind": "state", "subject": "rendered_shell", "expected": "preserve accumulation between calls" }
+    ],
+    "acceptance": [
+      { "kind": "manual", "command_or_assertion": "Review the proposed boundary and approve ownership of global state and hooks.", "executable": false }
+    ],
+    "context_roots": ["A-prompt/fixtures/score5_globals.php"],
+    "dependencies": [],
+    "conflict_keys": ["symbol:render_theme_shell", "resource:theme-hooks", "resource:rendered-shell-global"],
+    "quality_target": 0.99,
+    "ambiguities": [],
+    "field_provenance": {
+      "description": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-global-architecture"] },
+      "targets": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-global-architecture"] },
+      "change_surface": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-global-architecture"] },
+      "constraints": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-global-architecture"] }
+    }
+  },
+  "expected_static": {
+    "symbols": [
+      { "name": "render_theme_shell", "kind": "function" }
+    ],
+    "calls": ["apply_filters", "do_action", "ob_get_clean", "ob_start"],
+    "effect_kinds": [
+      "global_state_read", "global_state_write", "hook_dispatch", "output_buffer", "output_write"
+    ],
+    "state_accesses": [
+      { "subject": "$theme_state", "scope": "global", "access": "read_write" },
+      { "subject": "$GLOBALS['rendered_shell']", "scope": "global", "access": "read_write" }
+    ],
+    "evidence_rule_ids": [
+      "php.global-declaration", "php.globals-array", "php.output-buffer-read",
+      "php.output-buffer-start", "php.output-write", "wordpress.action-dispatch",
+      "wordpress.filter-dispatch"
+    ],
+    "forbidden_effect_kinds": ["database_read", "database_write", "cache_read", "cache_write"]
+  },
+  "expected_semantic": {
+    "invariants": [
+      "theme hooks remain ordered before-header, header-filter, after-header, then nested-shell",
+      "the depth counter remains balanced across each call",
+      "nested calls dispatch theme_nested_shell only when depth exceeds one",
+      "captured HTML continues to accumulate in rendered_shell"
+    ],
+    "risk_kinds": ["global_state", "hidden_side_effects", "reentry", "hook_order"],
+    "required_capabilities": ["deep_reasoning", "framework_semantics", "migration_design", "human_approval"]
+  },
+  "ignored_source_kinds": ["comment"]
 }

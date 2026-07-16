@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "id": "wpquery-data-contract",
+  "split": "calibration",
+  "task_text": "Move featured_products_on_sale behind a repository and cache boundary while preserving query and cache behavior.",
+  "task_profile_path": "A-prompt/fixtures/score4_wpquery.expected.json",
+  "task_profile_pointer": "/task",
+  "source_files": ["A-prompt/fixtures/score4_wpquery.php"],
+  "invariants": [
+    "query filters require featured products with a positive numeric sale price",
+    "results remain ordered by ascending numeric sale price",
+    "cache keys remain distinct for different limits",
+    "cache freshness remains bounded by one hour"
+  ],
+  "validations": [
+    { "kind": "assertion", "command_or_assertion": "Repository results preserve filters, ordering, key partitioning, and TTL.", "executable": false }
+  ],
+  "candidate_routes": [
+    { "model": "claude-sonnet-5", "effort": "high" },
+    { "model": "claude-opus-4-8", "effort": "medium" },
+    { "model": "claude-opus-4-8", "effort": "high" }
+  ],
+  "repetitions": 3
+}

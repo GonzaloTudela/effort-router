@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "policy_version": "1.0.0",
+  "critic": {
+    "default_model": "claude-haiku-4-5",
+    "escalation_model": "claude-opus-4-8",
+    "max_attempts": 2
+  },
+  "confidence": {
+    "confirm_minimum": 0.7,
+    "auto_minimum": 0.85
+  },
+  "coverage": {
+    "confirm_resolved_call_ratio": 0.8,
+    "auto_resolved_call_ratio": 0.95,
+    "parsed_file_ratio": 1
+  },
+  "calibration": {
+    "minimum_comparable_samples": 20,
+    "wilson_z": 1.96
+  },
+  "context_safety_ratio": 0.9
+}

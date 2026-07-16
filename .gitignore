@@ -13,5 +13,10 @@ scratchpad/
 *.log
 tmp/
 
+# Node runtime and local evidence
+node_modules/
+.effort-router/
+*.jsonl
+
 # Rust (Etapa C, futuro)
 /C-analyzer/target/

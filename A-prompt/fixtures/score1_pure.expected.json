@@ -1,19 +1,58 @@
 {
-  "complexity_score": 1,
-  "summary": "Funciones puras de transformación de string y formateo numérico; sin framework, sin I/O, sin estado global.",
-  "dependencies": [],
-  "pure_inputs": ["text:string", "cents:int"],
-  "pure_outputs": ["slug:string", "importe formateado:string"],
-  "invariants": [
-    "slugify es idempotente sobre su propia salida",
-    "el redondeo de céntimos no pierde precisión"
-  ],
-  "context_sensitivity": "low",
-  "recommended_effort": "low",
-  "recommended_model": "claude-haiku-4-5",
-  "requires_human": false,
-  "reasons": [
-    "Determinista y sin dependencias: entrada -> salida sin efectos.",
-    "Traducción directa a Rust (funciones puras)."
-  ]
+  "schema_version": "1.0.0",
+  "source": "A-prompt/fixtures/score1_pure.php",
+  "task": {
+    "schema_version": "1.0.0",
+    "id": "fixture-pure-body",
+    "contract_status": "complete",
+    "missing_fields": [],
+    "operation": "refactor",
+    "description": "Refactor the two pure functions without changing their observable results.",
+    "targets": [
+      { "path": "A-prompt/fixtures/score1_pure.php", "symbol": "slugify" },
+      { "path": "A-prompt/fixtures/score1_pure.php", "symbol": "cents_to_eur" }
+    ],
+    "change_surface": "body",
+    "constraints": [
+      { "kind": "behavior", "subject": "slugify", "expected": "preserve normalization and idempotence" },
+      { "kind": "behavior", "subject": "cents_to_eur", "expected": "preserve integer-cent formatting" }
+    ],
+    "acceptance": [
+      { "kind": "command", "command_or_assertion": "php -l A-prompt/fixtures/score1_pure.php", "executable": true }
+    ],
+    "context_roots": ["A-prompt/fixtures/score1_pure.php"],
+    "dependencies": [],
+    "conflict_keys": ["file:A-prompt/fixtures/score1_pure.php"],
+    "quality_target": 0.95,
+    "ambiguities": [],
+    "field_provenance": {
+      "description": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-pure-body"] },
+      "targets": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-pure-body"] },
+      "change_surface": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-pure-body"] },
+      "acceptance": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-pure-body"] }
+    }
+  },
+  "expected_static": {
+    "symbols": [
+      { "name": "slugify", "kind": "function" },
+      { "name": "cents_to_eur", "kind": "function" }
+    ],
+    "calls": ["abs", "intdiv", "preg_replace", "sprintf", "strtolower", "trim"],
+    "effect_kinds": [],
+    "state_accesses": [],
+    "evidence_rule_ids": [],
+    "forbidden_effect_kinds": [
+      "database_read", "database_write", "cache_read", "cache_write",
+      "global_state_read", "global_state_write", "hook_dispatch", "output_buffer", "output_write"
+    ]
+  },
+  "expected_semantic": {
+    "invariants": [
+      "slugify remains idempotent for its normalized output",
+      "integer cents are formatted without floating-point precision loss"
+    ],
+    "risk_kinds": ["behavioral_equivalence"],
+    "required_capabilities": ["code_editing", "php_semantics"]
+  },
+  "ignored_source_kinds": ["comment"]
 }

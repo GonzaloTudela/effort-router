@@ -1,59 +1,62 @@
 # abn-effort-router
 
-Enrutador de **effort** para Claude Code. Clasifica una tarea de código — o cada paso de un plan — por complejidad/acoplamiento y sugiere o aplica automáticamente el par **`(effort, modelo)`** óptimo, despachando el trabajo a un subagente del tier adecuado. Objetivo: **calidad > velocidad > coste**.
+<!-- Generado por scripts/generate.mjs. No editar directamente. -->
 
-Caso de uso motor: migrar PHP legado (WordPress/Laravel/CLI) a Rust. El mecanismo es general.
+Plugin de Claude Code que selecciona modelo y `effort` mediante una evaluación híbrida y auditable de la tarea frente al código afectado. La IA interpreta intención e invariantes; un analizador PHP extrae hechos; guardas deterministas eliminan rutas inseguras; la evidencia histórica selecciona la opción mínima que supera el objetivo de calidad.
 
-## Cómo funciona
+## Flujo
 
-El `effort` del bucle principal de Claude Code no es programable por tarea. La palanca real es **despachar a subagentes**: un **Critic** barato (`claude-haiku-4-5`) clasifica la tarea; un **Actor** del tier recomendado (`sonnet-5` / `opus-4-8`, hasta `xhigh`) la ejecuta. Código entrelazado (score 5) dispara un **circuit breaker** y no se procesa.
-
-Rúbrica score → `(effort, modelo)`:
-
-| Score | effort | modelo |
-|---|---|---|
-| 1 | (omitido) | Haiku |
-| 2 | medium | Sonnet 5 |
-| 3 | medium | **Opus 4.8** (capable-first; alt: high · Sonnet 5) |
-| 4 | high→xhigh | Opus 4.8 |
-| 5 | — | **breaker** (`requires_human`) |
-
-> **Capable-first:** para tareas complejas (score ≥ 3) se prefiere Opus 4.8 y se regula el coste con el **effort dentro de Opus**, no bajando de modelo. Haiku no acepta `output_config.effort` (se omite). `max` y Fable 5 solo con aprobación explícita.
->
-> **Puerta de contexto:** Haiku tope 200K; Sonnet 5 / Opus 4.8 / Fable 5 son 1M (Opus 4.8 a precio estándar). Si el contexto es grande o `context_sensitivity=high` → excluir Haiku, preferir Opus 4.8 (1M). No hay un modelo "Opus 1M" separado: `claude-opus-4-8` ya es 1M.
-
-## Estructura
-
-```
-.claude-plugin/
-  plugin.json            manifest del plugin effort-router
-  marketplace.json       catálogo (permite /plugin marketplace add)
-skills/
-  effort-router/
-    SKILL.md             la skill (auto-descubierta por el plugin)
-A-prompt/
-  classifier.md          rúbrica + CLASSIFIER_SYSTEM_PROMPT + DECISION_SCHEMA + uso
-  fixtures/              score{1,4,5}_*.php + *.expected.json (gold de validación)
-PLAN.md                  plan completo (A→B→C)
+```text
+prosa o TaskProfile
+  -> Critic: contrato provisional
+  -> AST/IR PHP: símbolos, llamadas, estado, efectos y cobertura
+  -> slice según body/signature/callers/data_contract/architecture
+  -> Critic: contraste semántico con evidencia citada
+  -> MatchProfile: hechos, claims, requisitos y discrepancias separados
+  -> guardas + catálogo + resultados versionados
+  -> RouteDecision: dispatch | request_context | request_task_contract | escalate_critic | human_review
+  -> Actor con contrato, slice, restricciones y aceptación
 ```
 
-## Uso
+El Critic no contiene campos de modelo, `effort` ni score. Comentarios, keywords y nombres no activan una ruta. La falta de contexto, cobertura, concordancia o calibración permanece explícita.
 
-Guía completa end-to-end (instalación, escenarios tarea/plan, `--auto`/`--confirm`): **[USAGE.md](USAGE.md)**.
+## Uso rápido
 
-**Etapa A (validar la rúbrica):** clasificar los fixtures con Haiku y comparar contra los `*.expected.json`. Ver `A-prompt/classifier.md` §4-5.
-
-**Etapa B (plugin):** instalar desde el repo público y ejecutar en Claude Code:
-```
+```text
 /plugin marketplace add GonzaloTudela/effort-router
 /plugin install effort-router@effort-router-marketplace
-/effort-router:effort-router [--auto|--confirm] <fichero|fragmento|plan>
+/effort-router:effort-router --confirm "Refactoriza src/Price.php::calculate sin cambiar el contrato"
+/effort-router:effort-router --spec task.json
 ```
-- `--confirm` (default): muestra la decisión, aprobar antes de despachar.
-- `--auto`: despacha directo al tier recomendado.
 
-## Estado
+`--auto` exige todas las puertas de seguridad. `--confirm` permite corregir el contrato o aprobar el bootstrap conservador cuando aún no existe muestra comparable.
 
-- [x] Etapa A — activo reutilizable (rúbrica, prompt, schema, fixtures).
-- [x] Etapa B — plugin `effort-router` (Critic Haiku → Actor tierizado, `--auto/--confirm`, tarea|plan, breaker).
-- [ ] Etapa C — analizador de repo entero en **Rust** (concurrencia, caché por hash, guión de effort). Diferida hasta validar B.
+## Runtime y desarrollo
+
+- Plugin `0.3.0`.
+- Node `>=20` en runtime.
+- `dist/analyzer.mjs` incluye el parser; el usuario no instala dependencias ni aporta API key.
+- Las llamadas Critic/Actor se realizan mediante subagentes de Claude Code.
+
+```text
+npm install
+npm run generate
+npm run build
+npm test
+npm run generate:check
+npm run build:check
+```
+
+## Fuentes canónicas
+
+- `schemas/`: contratos estrictos y versionados.
+- `A-prompt/classifier.md`: prompt del Critic sin autoridad de ruta.
+- `rules/`: efectos PHP, WordPress y Laravel sin pesos de dificultad.
+- `policy/model-catalog.json`: capacidades y combinaciones soportadas.
+- `policy/router-policy.json`: guardas, confianza, cobertura y calibración.
+- `evaluation/`: casos separados de calibración/retención y resultados.
+- `evaluation/metrics/` y `evaluation/benchmarks/`: muestras, límites conservadores y perfiles sin fuente.
+- `policy/promotion-gates.json`: puertas de seguridad, promoción y Rust.
+- `templates/` + `scripts/generate.mjs`: skill y documentación generadas.
+
+Consulta [USAGE.md](USAGE.md) para el flujo operativo y [PLAN.md](PLAN.md) para el estado de entrega.

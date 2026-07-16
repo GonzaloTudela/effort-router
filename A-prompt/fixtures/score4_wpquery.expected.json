@@ -1,25 +1,61 @@
 {
-  "complexity_score": 4,
-  "summary": "Consulta WP_Query con meta_query AND/NUMERIC, ordenación por meta y caché por transient; estado tras frontera pero ORM/caché no trivial.",
-  "dependencies": [
-    { "name": "WP_Query", "kind": "framework", "abstractability": "port" },
-    { "name": "get_transient/set_transient", "kind": "io", "abstractability": "port" },
-    { "name": "wp_list_pluck", "kind": "framework", "abstractability": "trivial" },
-    { "name": "HOUR_IN_SECONDS", "kind": "framework", "abstractability": "trivial" }
-  ],
-  "pure_inputs": ["limit:int"],
-  "pure_outputs": ["ids:array<int>"],
-  "invariants": [
-    "el orden ASC por _sale_price debe preservarse",
-    "la clave de caché depende de limit; no colisionar entre límites distintos",
-    "el TTL de una hora acota la frescura de los resultados"
-  ],
-  "context_sensitivity": "high",
-  "recommended_effort": "xhigh",
-  "recommended_model": "claude-opus-4-8",
-  "requires_human": false,
-  "reasons": [
-    "La meta_query con relación AND y comparador NUMERIC exige traducir semántica de consulta a SQL/ORM Rust con cuidado.",
-    "La capa de caché por transient introduce estado con TTL que debe replicarse tras una frontera de repositorio."
-  ]
+  "schema_version": "1.0.0",
+  "source": "A-prompt/fixtures/score4_wpquery.php",
+  "task": {
+    "schema_version": "1.0.0",
+    "id": "fixture-wpquery-contract",
+    "contract_status": "complete",
+    "missing_fields": [],
+    "operation": "migrate",
+    "description": "Move featured_products_on_sale behind a repository and cache boundary while preserving query and cache behavior.",
+    "targets": [
+      { "path": "A-prompt/fixtures/score4_wpquery.php", "symbol": "featured_products_on_sale" }
+    ],
+    "change_surface": "data_contract",
+    "constraints": [
+      { "kind": "ordering", "subject": "returned product IDs", "expected": "ascending numeric _sale_price" },
+      { "kind": "cache_key", "subject": "featured product cache", "expected": "include limit" },
+      { "kind": "ttl", "subject": "featured product cache", "expected": "one hour" }
+    ],
+    "acceptance": [
+      { "kind": "assertion", "command_or_assertion": "Repository results preserve query filters, numeric ordering, limit-specific keys, and one-hour TTL.", "executable": false }
+    ],
+    "context_roots": ["A-prompt/fixtures/score4_wpquery.php"],
+    "dependencies": [],
+    "conflict_keys": ["symbol:featured_products_on_sale", "resource:featured-product-cache"],
+    "quality_target": 0.98,
+    "ambiguities": [],
+    "field_provenance": {
+      "description": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-wpquery-contract"] },
+      "targets": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-wpquery-contract"] },
+      "change_surface": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-wpquery-contract"] },
+      "constraints": { "source": "spec", "confidence": 1, "evidence_refs": ["task:fixture-wpquery-contract"] }
+    }
+  },
+  "expected_static": {
+    "symbols": [
+      { "name": "featured_products_on_sale", "kind": "function" }
+    ],
+    "calls": ["WP_Query", "get_transient", "set_transient", "wp_list_pluck"],
+    "effect_kinds": ["cache_read", "cache_write", "database_read"],
+    "state_accesses": [
+      { "subject": "wordpress:transients", "scope": "external", "access": "read_write" },
+      { "subject": "wordpress:database", "scope": "external", "access": "read" }
+    ],
+    "evidence_rule_ids": [
+      "wordpress.transient-read", "wordpress.transient-write", "wordpress.wp-query"
+    ],
+    "forbidden_effect_kinds": ["global_state_write", "hook_dispatch", "output_buffer", "output_write"]
+  },
+  "expected_semantic": {
+    "invariants": [
+      "query filters require featured products with a positive numeric sale price",
+      "results remain ordered by ascending numeric sale price",
+      "cache keys remain distinct for different limits",
+      "cache freshness remains bounded by one hour"
+    ],
+    "risk_kinds": ["cache_consistency", "query_semantics", "data_contract"],
+    "required_capabilities": ["framework_semantics", "migration_design", "test_generation"]
+  },
+  "ignored_source_kinds": ["comment"]
 }

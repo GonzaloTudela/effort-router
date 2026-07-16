@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "source": "repository baseline; verify against Claude Code model availability before release",
+  "verified_at": "2026-07-16",
+  "models": [
+    {
+      "id": "claude-haiku-4-5",
+      "workflow_alias": "haiku",
+      "context_window": 200000,
+      "supported_efforts": [null],
+      "capabilities": ["code_editing", "tool_use", "php_semantics", "test_generation"],
+      "capability_rank": 1,
+      "cost_rank": 1,
+      "latency_rank": 1,
+      "approval_required": false,
+      "enabled": true
+    },
+    {
+      "id": "claude-sonnet-5",
+      "workflow_alias": "sonnet",
+      "context_window": 1000000,
+      "supported_efforts": ["medium", "high", "xhigh"],
+      "capabilities": [
+        "code_editing", "tool_use", "php_semantics", "framework_semantics",
+        "migration_design", "test_generation", "large_context", "concurrent_planning"
+      ],
+      "capability_rank": 2,
+      "cost_rank": 2,
+      "latency_rank": 2,
+      "approval_required": false,
+      "enabled": true
+    },
+    {
+      "id": "claude-opus-4-8",
+      "workflow_alias": "opus",
+      "context_window": 1000000,
+      "supported_efforts": ["low", "medium", "high", "xhigh"],
+      "capabilities": [
+        "deep_reasoning", "large_context", "code_editing", "tool_use", "php_semantics",
+        "framework_semantics", "migration_design", "test_generation", "concurrent_planning"
+      ],
+      "capability_rank": 3,
+      "cost_rank": 3,
+      "latency_rank": 3,
+      "approval_required": false,
+      "enabled": true
+    },
+    {
+      "id": "claude-fable-5",
+      "workflow_alias": "fable",
+      "context_window": 1000000,
+      "supported_efforts": ["max"],
+      "capabilities": [
+        "deep_reasoning", "large_context", "code_editing", "tool_use", "php_semantics",
+        "framework_semantics", "migration_design", "test_generation", "concurrent_planning",
+        "human_approval"
+      ],
+      "capability_rank": 4,
+      "cost_rank": 4,
+      "latency_rank": 4,
+      "approval_required": true,
+      "enabled": true
+    }
+  ]
+}

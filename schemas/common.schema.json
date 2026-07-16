@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/common.schema.json",
+  "title": "Effort Router common definitions",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "start_line", "end_line"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "start_line": { "type": "integer", "minimum": 1 },
+        "end_line": { "type": "integer", "minimum": 1 },
+        "start_column": { "type": ["integer", "null"], "minimum": 1 },
+        "end_column": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "confidence", "evidence_refs"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["user", "spec", "critic", "static_analyzer", "matcher", "policy", "history"]
+        },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "capability": {
+      "type": "string",
+      "enum": [
+        "deep_reasoning",
+        "large_context",
+        "code_editing",
+        "tool_use",
+        "php_semantics",
+        "framework_semantics",
+        "migration_design",
+        "test_generation",
+        "concurrent_planning",
+        "human_approval"
+      ]
+    },
+    "effectKind": {
+      "type": "string",
+      "enum": [
+        "database_read",
+        "database_write",
+        "network_read",
+        "network_write",
+        "filesystem_read",
+        "filesystem_write",
+        "cache_read",
+        "cache_write",
+        "event_dispatch",
+        "hook_dispatch",
+        "output_write",
+        "output_buffer",
+        "global_state_read",
+        "global_state_write",
+        "static_state_read",
+        "static_state_write",
+        "reflection",
+        "dynamic_code",
+        "process_control",
+        "clock_read",
+        "random_read"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source", "kind", "location", "rule_id", "detail", "confidence"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "source": {
+          "type": "string",
+          "enum": ["task", "static", "semantic", "history", "policy"]
+        },
+        "kind": { "$ref": "#/$defs/nonEmptyString" },
+        "location": {
+          "anyOf": [
+            { "$ref": "#/$defs/location" },
+            { "type": "null" }
+          ]
+        },
+        "rule_id": {
+          "anyOf": [
+            { "$ref": "#/$defs/nonEmptyString" },
+            { "type": "null" }
+          ]
+        },
+        "detail": { "$ref": "#/$defs/nonEmptyString" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    }
+  }
+}

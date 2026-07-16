@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "language": "php",
+  "framework": null,
+  "rules": [
+    {
+      "id": "php.global-declaration",
+      "matcher": { "node_kind": "language_construct", "match": "exact", "pattern": "global" },
+      "effects": [],
+      "state_scope": "global",
+      "state_access": "read_write",
+      "description": "A global declaration exposes process-level mutable state; concrete reads and writes come from assignments and expressions."
+    },
+    {
+      "id": "php.globals-array",
+      "matcher": { "node_kind": "language_construct", "match": "exact", "pattern": "$GLOBALS" },
+      "effects": ["global_state_read", "global_state_write"],
+      "state_scope": "global",
+      "state_access": "read_write",
+      "resource": "php:global-state",
+      "description": "Access through the GLOBALS superglobal reads or mutates process-level state."
+    },
+    {
+      "id": "php.output-buffer-start",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "ob_start" },
+      "effects": ["output_buffer"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "php:output-buffer",
+      "description": "Starts a process output buffer."
+    },
+    {
+      "id": "php.output-buffer-read",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "ob_get_clean" },
+      "effects": ["output_buffer"],
+      "state_scope": "external",
+      "state_access": "read_write",
+      "resource": "php:output-buffer",
+      "description": "Reads and closes the active process output buffer."
+    },
+    {
+      "id": "php.output-write",
+      "matcher": { "node_kind": "language_construct", "match": "exact", "pattern": "echo" },
+      "effects": ["output_write"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "php:output",
+      "description": "Writes to the current output stream or buffer."
+    },
+    {
+      "id": "php.eval",
+      "matcher": { "node_kind": "language_construct", "match": "exact", "pattern": "eval" },
+      "effects": ["dynamic_code"],
+      "state_scope": null,
+      "state_access": null,
+      "description": "Evaluates code unavailable to static call resolution."
+    },
+    {
+      "id": "php.dynamic-call",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(call_user_func|call_user_func_array)$" },
+      "effects": ["dynamic_code"],
+      "state_scope": null,
+      "state_access": null,
+      "description": "Invokes a callable whose target can depend on runtime data."
+    },
+    {
+      "id": "php.reflection",
+      "matcher": { "node_kind": "class_reference", "match": "regex", "pattern": "^Reflection" },
+      "effects": ["reflection"],
+      "state_scope": null,
+      "state_access": null,
+      "description": "Uses runtime reflection and may expose symbols unavailable from local syntax alone."
+    },
+    {
+      "id": "php.include",
+      "matcher": { "node_kind": "language_construct", "match": "regex", "pattern": "^(include|include_once|require|require_once)$" },
+      "effects": ["filesystem_read", "dynamic_code"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "php:filesystem",
+      "description": "Loads and evaluates a PHP file selected by an expression."
+    },
+    {
+      "id": "php.filesystem-read",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(file_get_contents|fopen|file|readfile|scandir|glob)$" },
+      "effects": ["filesystem_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "php:filesystem",
+      "description": "Reads data or metadata from the filesystem."
+    },
+    {
+      "id": "php.filesystem-write",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(file_put_contents|fwrite|unlink|rename|copy|mkdir|rmdir)$" },
+      "effects": ["filesystem_write"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "php:filesystem",
+      "description": "Mutates filesystem contents or structure."
+    },
+    {
+      "id": "php.network-call",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(curl_exec|fsockopen|stream_socket_client)$" },
+      "effects": ["network_read", "network_write"],
+      "state_scope": "external",
+      "state_access": "read_write",
+      "resource": "php:network",
+      "description": "Performs network I/O through a PHP runtime API."
+    },
+    {
+      "id": "php.process-control",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(exec|shell_exec|system|passthru|proc_open|popen)$" },
+      "effects": ["process_control"],
+      "state_scope": "external",
+      "state_access": "read_write",
+      "resource": "php:processes",
+      "description": "Starts or communicates with an external process."
+    },
+    {
+      "id": "php.clock-read",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(time|microtime|hrtime)$" },
+      "effects": ["clock_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "php:clock",
+      "description": "Reads the runtime clock."
+    },
+    {
+      "id": "php.random-read",
+      "matcher": { "node_kind": "call", "match": "regex", "pattern": "^(rand|mt_rand|random_int|random_bytes)$" },
+      "effects": ["random_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "php:randomness",
+      "description": "Consumes runtime randomness."
+    }
+  ]
+}

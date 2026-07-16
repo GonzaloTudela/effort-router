@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/benchmark-report.schema.json",
+  "title": "Analyzer benchmark report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "analyzer_version", "generated_at", "repositories", "totals",
+    "analyzer_latency_share", "measured_rust_speedup", "byte_compatible_json", "privacy"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "analyzer_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "generated_at": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repository_id", "php_files", "source_bytes", "symbols", "calls",
+          "unresolved_calls", "analysis_ms", "profile_hash"
+        ],
+        "properties": {
+          "repository_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "php_files": { "type": "integer", "minimum": 0 },
+          "source_bytes": { "type": "integer", "minimum": 0 },
+          "symbols": { "type": "integer", "minimum": 0 },
+          "calls": { "type": "integer", "minimum": 0 },
+          "unresolved_calls": { "type": "integer", "minimum": 0 },
+          "analysis_ms": { "type": "number", "minimum": 0 },
+          "profile_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositories", "php_files", "source_bytes", "analysis_ms"],
+      "properties": {
+        "repositories": { "type": "integer", "minimum": 0 },
+        "php_files": { "type": "integer", "minimum": 0 },
+        "source_bytes": { "type": "integer", "minimum": 0 },
+        "analysis_ms": { "type": "number", "minimum": 0 }
+      }
+    },
+    "analyzer_latency_share": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "measured_rust_speedup": { "type": ["number", "null"], "minimum": 0 },
+    "byte_compatible_json": { "type": "boolean" },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_stored", "repository_paths_stored"],
+      "properties": {
+        "source_stored": { "const": false },
+        "repository_paths_stored": { "const": false }
+      }
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/match-profile.schema.json",
+  "title": "MatchProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "match_id", "task_id", "operation", "change_surface",
+    "code_profile_id", "semantic_assessment_id", "affected_symbols", "affected_files",
+    "context_estimate", "intrinsic_complexity", "semantic_difficulty", "coupling",
+    "effect_kinds", "blast_radius", "testability", "reversibility", "unresolved_calls",
+    "analysis_coverage", "semantic_confidence", "requirements", "required_capabilities",
+    "blockers", "disagreements", "evidence"
+  ],
+  "$defs": {
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "evidence_refs"],
+      "properties": {
+        "level": { "type": "string", "enum": ["low", "moderate", "high", "unknown"] },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "match_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "task_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "operation": {
+      "type": "string",
+      "enum": ["inspect", "fix", "refactor", "migrate", "test", "generate"]
+    },
+    "change_surface": {
+      "type": "string",
+      "enum": ["body", "signature", "callers", "data_contract", "architecture"]
+    },
+    "code_profile_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "semantic_assessment_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "affected_symbols": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "affected_files": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "context_estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_count", "symbol_count", "estimated_tokens", "bounded"],
+      "properties": {
+        "file_count": { "type": "integer", "minimum": 0 },
+        "symbol_count": { "type": "integer", "minimum": 0 },
+        "estimated_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "bounded": { "type": "boolean" }
+      }
+    },
+    "intrinsic_complexity": { "$ref": "#/$defs/assessment" },
+    "semantic_difficulty": { "$ref": "#/$defs/assessment" },
+    "coupling": { "$ref": "#/$defs/assessment" },
+    "effect_kinds": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/effectKind" },
+      "uniqueItems": true
+    },
+    "blast_radius": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "direct_dependents", "transitive_dependents", "evidence_refs"],
+      "properties": {
+        "level": { "type": "string", "enum": ["low", "moderate", "high", "unknown"] },
+        "direct_dependents": { "type": "integer", "minimum": 0 },
+        "transitive_dependents": { "type": ["integer", "null"], "minimum": 0 },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "testability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "commands", "evidence_refs"],
+      "properties": {
+        "level": { "type": "string", "enum": ["poor", "partial", "good", "unknown"] },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "reversibility": { "$ref": "#/$defs/assessment" },
+    "unresolved_calls": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "analysis_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parsed_file_ratio", "resolved_call_ratio", "bounded"],
+      "properties": {
+        "parsed_file_ratio": { "$ref": "common.schema.json#/$defs/confidence" },
+        "resolved_call_ratio": { "$ref": "common.schema.json#/$defs/confidence" },
+        "bounded": { "type": "boolean" }
+      }
+    },
+    "semantic_confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "task_interpretation", "code_alignment"],
+      "properties": {
+        "overall": { "$ref": "common.schema.json#/$defs/confidence" },
+        "task_interpretation": { "$ref": "common.schema.json#/$defs/confidence" },
+        "code_alignment": { "$ref": "common.schema.json#/$defs/confidence" }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "source", "description", "evidence_refs"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "source": { "type": "string", "enum": ["task", "semantic", "static"] },
+          "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "required_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability", "provenance"],
+        "properties": {
+          "capability": { "$ref": "common.schema.json#/$defs/capability" },
+          "provenance": { "$ref": "common.schema.json#/$defs/provenance" }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "severity", "description", "evidence_refs"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "contract_incomplete", "parse_failure", "unbounded_slice", "unresolved_effect",
+              "missing_context", "insufficient_coverage", "unexecutable_acceptance", "disagreement",
+              "unsupported_claim", "unsupported_capability", "insufficient_calibration"
+            ]
+          },
+          "severity": { "type": "string", "enum": ["blocks_auto", "blocks_dispatch"] },
+          "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "disagreements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "static_evidence_ref", "material", "description"],
+        "properties": {
+          "claim_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "static_evidence_ref": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "material": { "type": "boolean" },
+          "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/evidence" }
+    }
+  }
+}

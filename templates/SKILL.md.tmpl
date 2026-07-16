@@ -1,0 +1,87 @@
+---
+name: effort-router
+description: Evalúa una tarea o plan contra el código afectado mediante Critic semántico, análisis PHP estático, guardas deterministas y calibración; después despacha Actors con evidencia verificable. Úsala con /effort-router, al elegir modelo/effort o al ejecutar planes por dependencias seguras.
+---
+
+<!-- Generado por scripts/generate.mjs. No editar directamente. -->
+
+# effort-router
+
+Versión del plugin `{{PACKAGE_VERSION}}`; analizador `{{ANALYZER_VERSION}}`; política `{{POLICY_VERSION}}`; catálogo `{{CATALOG_VERSION}}`.
+
+## Invocación
+
+```text
+/effort-router:effort-router [--auto|--confirm] [--spec task.json] <tarea | fragmento | plan>
+```
+
+- `--confirm` es el modo predeterminado. Permite corregir el contrato y confirmar una ruta conservadora sin muestra suficiente.
+- `--auto` solo despacha cuando contrato, confianza, concordancia, cobertura, aceptación y calibración permiten automatizar.
+- `--spec` carga un `TaskProfile` reproducible. La prosa adicional es descripción, no puede contradecir el spec silenciosamente.
+
+Requiere Node `{{NODE_REQUIREMENT}}`. Si Node o `dist/analyzer.mjs` no están disponibles, devuelve `human_review`; no reemplaces el análisis con keywords o una estimación libre.
+
+## Regla de autoridad
+
+El Critic interpreta la intención y contrasta semántica. Nunca elige modelo, `effort`, acción o score. `dist/analyzer.mjs` produce hechos y ejecuta guardas/selector. No alteres su `RouteDecision` salvo aprobación humana explícita registrada.
+
+## Prompt canónico del Critic
+
+Usa este prompt como `system` del agente Critic. El modelo predeterminado generado desde la política es `{{CRITIC_DEFAULT_MODEL}}`; no envíes `effort` al Critic. Ante `escalate_critic`, repite como máximo `{{CRITIC_MAX_ATTEMPTS}}` intentos totales usando `{{CRITIC_ESCALATION_MODEL}}` y el contexto solicitado.
+
+```text
+{{CRITIC_PROMPT}}
+```
+
+## Flujo de una tarea
+
+1. **Normaliza el contrato.**
+   - Con `--spec`, lee y valida `schemas/task-profile.schema.json`.
+   - Con prosa, llama al Critic en etapa `TASK_NORMALIZATION` con ese schema.
+   - Si `contract_status=incomplete`, muestra `missing_fields` y ambigüedades materiales; acción `request_task_contract`.
+2. **Analiza y recorta.** Pasa por stdin `{root, task_profile}` a:
+
+   ```text
+   node "${CLAUDE_PLUGIN_ROOT}/dist/analyzer.mjs" analyze
+   ```
+
+   Conserva `CodeProfile`, `impact_slice`, cobertura, llamadas sin resolver y toda evidencia. No pegues código en telemetría.
+3. **Contrasta semántica.** Llama al Critic en etapa `SLICE_ASSESSMENT` con tarea original, `TaskProfile` y exactamente `impact_slice.code_profile`; valida `schemas/semantic-assessment.schema.json`.
+4. **Reconcila y enruta.** Pasa por stdin `{task_profile, semantic_assessment, impact_slice, mode, approved_models}` a:
+
+   ```text
+   node "${CLAUDE_PLUGIN_ROOT}/dist/analyzer.mjs" route
+   ```
+
+5. **Respeta la acción.** Muestra hechos estáticos, claims semánticos, discrepancias, guardas, candidatos rechazados, muestra histórica y versiones.
+   - `request_context`: solicita solo las referencias indicadas y vuelve a analizar.
+   - `request_task_contract`: pide los campos materiales ausentes.
+   - `escalate_critic`: usa el Critic de escalado con el mismo schema; nunca le pidas una ruta.
+   - `human_review`: no despaches.
+   - `dispatch`: continúa únicamente con el candidato seleccionado.
+6. **Confirma cuando corresponda.** En `--confirm`, presenta el contrato y la decisión antes de ejecutar. En `--auto`, no añadas una excepción manual implícita.
+7. **Construye el Actor.** Pasa los cuatro perfiles y la decisión a `actor-payload`. Despacha con el `model` devuelto y añade `effort` solo si no es `null`.
+8. **Registra el resultado.** Pasa perfiles, decisión, aceptación, tests, correcciones, latencia y uso a `record`. Guarda JSONL solo en una ruta local aprobada. El registro contiene hashes e IDs, nunca fuente ni secretos.
+
+El Actor debe recibir contrato, slice exacto, evaluación semántica, restricciones, discrepancias resueltas, evidencia citada y comandos de aceptación. No lo sustituyas por la prosa original.
+
+## Planes
+
+1. Convierte cada nodo en un `TaskProfile` con `dependencies` y `conflict_keys` explícitos.
+2. Normaliza contratos; se pueden procesar en paralelo porque aún no modifican código.
+3. Analiza, contrasta y enruta cada nodo.
+4. Pasa `{task_profiles, impact_slices}` por stdin a `dist/analyzer.mjs plan`.
+5. Ejecuta solo una ola de `dag.waves` cada vez. Dentro de una ola, usa `parallel` únicamente para nodos incluidos por el DAG.
+6. Un nodo no `dispatch` o fallido bloquea sus dependientes transitivos. Las ramas sin dependencia continúan.
+7. Nunca paralelices tareas que compartan archivo, símbolo, recurso, estado global o `conflict_key`, aunque el texto del plan diga que son independientes.
+
+## Fallos
+
+- Schema inválido, refusal o salida truncada: reintento acotado; después `escalate_critic` o `human_review`.
+- Parseo fallido, llamada dinámica, efecto no resuelto o desacuerdo material: nunca rebajar de ruta ni inventar cobertura.
+- Sin muestra comparable: `--auto` devuelve revisión; `--confirm` puede ofrecer la ruta conservadora capaz y debe mostrar muestra cero.
+- Un candidato que exige aprobación no es viable hasta registrar esa aprobación explícita.
+
+## Desarrollo
+
+Los artefactos generados se comprueban con `npm run generate:check`; el bundle con `npm run build:check`; toda la suite y CI local con `npm run verify`.

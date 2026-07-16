@@ -1,0 +1,62 @@
+# abn-effort-router
+
+<!-- Generado por scripts/generate.mjs. No editar directamente. -->
+
+Plugin de Claude Code que selecciona modelo y `effort` mediante una evaluación híbrida y auditable de la tarea frente al código afectado. La IA interpreta intención e invariantes; un analizador PHP extrae hechos; guardas deterministas eliminan rutas inseguras; la evidencia histórica selecciona la opción mínima que supera el objetivo de calidad.
+
+## Flujo
+
+```text
+prosa o TaskProfile
+  -> Critic: contrato provisional
+  -> AST/IR PHP: símbolos, llamadas, estado, efectos y cobertura
+  -> slice según body/signature/callers/data_contract/architecture
+  -> Critic: contraste semántico con evidencia citada
+  -> MatchProfile: hechos, claims, requisitos y discrepancias separados
+  -> guardas + catálogo + resultados versionados
+  -> RouteDecision: dispatch | request_context | request_task_contract | escalate_critic | human_review
+  -> Actor con contrato, slice, restricciones y aceptación
+```
+
+El Critic no contiene campos de modelo, `effort` ni score. Comentarios, keywords y nombres no activan una ruta. La falta de contexto, cobertura, concordancia o calibración permanece explícita.
+
+## Uso rápido
+
+```text
+/plugin marketplace add GonzaloTudela/effort-router
+/plugin install effort-router@effort-router-marketplace
+/effort-router:effort-router --confirm "Refactoriza src/Price.php::calculate sin cambiar el contrato"
+/effort-router:effort-router --spec task.json
+```
+
+`--auto` exige todas las puertas de seguridad. `--confirm` permite corregir el contrato o aprobar el bootstrap conservador cuando aún no existe muestra comparable.
+
+## Runtime y desarrollo
+
+- Plugin `{{PACKAGE_VERSION}}`.
+- Node `{{NODE_REQUIREMENT}}` en runtime.
+- `dist/analyzer.mjs` incluye el parser; el usuario no instala dependencias ni aporta API key.
+- Las llamadas Critic/Actor se realizan mediante subagentes de Claude Code.
+
+```text
+npm install
+npm run generate
+npm run build
+npm test
+npm run generate:check
+npm run build:check
+```
+
+## Fuentes canónicas
+
+- `schemas/`: contratos estrictos y versionados.
+- `A-prompt/classifier.md`: prompt del Critic sin autoridad de ruta.
+- `rules/`: efectos PHP, WordPress y Laravel sin pesos de dificultad.
+- `policy/model-catalog.json`: capacidades y combinaciones soportadas.
+- `policy/router-policy.json`: guardas, confianza, cobertura y calibración.
+- `evaluation/`: casos separados de calibración/retención y resultados.
+- `evaluation/metrics/` y `evaluation/benchmarks/`: muestras, límites conservadores y perfiles sin fuente.
+- `policy/promotion-gates.json`: puertas de seguridad, promoción y Rust.
+- `templates/` + `scripts/generate.mjs`: skill y documentación generadas.
+
+Consulta [USAGE.md](USAGE.md) para el flujo operativo y [PLAN.md](PLAN.md) para el estado de entrega.

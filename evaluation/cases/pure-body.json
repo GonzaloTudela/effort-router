@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "id": "pure-body",
+  "split": "calibration",
+  "task_text": "Refactor the two pure functions without changing their observable results.",
+  "task_profile_path": "A-prompt/fixtures/score1_pure.expected.json",
+  "task_profile_pointer": "/task",
+  "source_files": ["A-prompt/fixtures/score1_pure.php"],
+  "invariants": [
+    "slugify remains idempotent for its normalized output",
+    "integer cents are formatted without floating-point precision loss"
+  ],
+  "validations": [
+    { "kind": "command", "command_or_assertion": "php -l A-prompt/fixtures/score1_pure.php", "executable": true }
+  ],
+  "candidate_routes": [
+    { "model": "claude-haiku-4-5", "effort": null },
+    { "model": "claude-sonnet-5", "effort": "medium" },
+    { "model": "claude-opus-4-8", "effort": "medium" }
+  ],
+  "repetitions": 3
+}

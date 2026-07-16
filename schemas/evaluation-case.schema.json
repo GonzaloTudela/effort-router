@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/evaluation-case.schema.json",
+  "title": "Evaluation case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "id", "split", "task_text", "task_profile_path", "task_profile_pointer",
+    "source_files", "invariants", "validations", "candidate_routes", "repetitions"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "split": { "type": "string", "enum": ["calibration", "retained"] },
+    "task_text": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "task_profile_path": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "task_profile_pointer": { "type": "string", "pattern": "^/" },
+    "source_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "invariants": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+      "uniqueItems": true
+    },
+    "validations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "command_or_assertion", "executable"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["command", "assertion", "test", "manual"] },
+          "command_or_assertion": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "executable": { "type": "boolean" }
+        }
+      }
+    },
+    "candidate_routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model", "effort"],
+        "properties": {
+          "model": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "effort": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    },
+    "repetitions": { "type": "integer", "minimum": 1 }
+  }
+}

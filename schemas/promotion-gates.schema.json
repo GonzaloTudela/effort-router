@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://effort-router.local/schemas/promotion-gates.schema.json",
+  "title": "Promotion and Rust gates",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "gates_version", "safety", "promotion", "rust"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "gates_version": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_unsafe_auto_routes", "minimum_determinism_rate", "minimum_schema_compliance"],
+      "properties": {
+        "maximum_unsafe_auto_routes": { "type": "integer", "minimum": 0 },
+        "minimum_determinism_rate": { "$ref": "common.schema.json#/$defs/confidence" },
+        "minimum_schema_compliance": { "$ref": "common.schema.json#/$defs/confidence" }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum_retained_samples", "maximum_success_regression", "maximum_correction_regression"],
+      "properties": {
+        "minimum_retained_samples": { "type": "integer", "minimum": 1 },
+        "maximum_success_regression": { "type": "number", "minimum": 0, "maximum": 1 },
+        "maximum_correction_regression": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "rust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_repositories", "minimum_php_files", "minimum_analyzer_latency_share",
+        "minimum_speedup", "require_byte_compatible_json"
+      ],
+      "properties": {
+        "minimum_repositories": { "type": "integer", "minimum": 1 },
+        "minimum_php_files": { "type": "integer", "minimum": 1 },
+        "minimum_analyzer_latency_share": { "$ref": "common.schema.json#/$defs/confidence" },
+        "minimum_speedup": { "type": "number", "exclusiveMinimum": 1 },
+        "require_byte_compatible_json": { "const": true }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "analyzer_latency_share": null,
+  "analyzer_version": "1.0.0",
+  "byte_compatible_json": false,
+  "generated_at": "2026-07-16T09:39:54.460Z",
+  "measured_rust_speedup": null,
+  "privacy": {
+    "repository_paths_stored": false,
+    "source_stored": false
+  },
+  "repositories": [
+    {
+      "analysis_ms": 13.99,
+      "calls": 17,
+      "php_files": 3,
+      "profile_hash": "43d5d72e3abcfe42b595601b1b582bbe13a85792e46299772fe2f2dfcd10c849",
+      "repository_id": "d76702c51cec853d",
+      "source_bytes": 2382,
+      "symbols": 7,
+      "unresolved_calls": 1
+    }
+  ],
+  "schema_version": "1.0.0",
+  "totals": {
+    "analysis_ms": 13.99,
+    "php_files": 3,
+    "repositories": 1,
+    "source_bytes": 2382
+  }
+}

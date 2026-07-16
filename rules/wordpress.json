@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "language": "php",
+  "framework": "wordpress",
+  "rules": [
+    {
+      "id": "wordpress.wp-query",
+      "matcher": { "node_kind": "constructor", "match": "exact", "pattern": "WP_Query" },
+      "effects": ["database_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "wordpress:database",
+      "description": "Constructing WP_Query executes a query against WordPress persistence."
+    },
+    {
+      "id": "wordpress.transient-read",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "get_transient" },
+      "effects": ["cache_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "wordpress:transients",
+      "description": "Reads a value from the WordPress transient cache."
+    },
+    {
+      "id": "wordpress.transient-write",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "set_transient" },
+      "effects": ["cache_write"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "wordpress:transients",
+      "description": "Writes a value and TTL to the WordPress transient cache."
+    },
+    {
+      "id": "wordpress.action-dispatch",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "do_action" },
+      "effects": ["hook_dispatch"],
+      "state_scope": "external",
+      "state_access": "read_write",
+      "resource": "wordpress:hooks",
+      "description": "Dispatches callbacks registered for a WordPress action."
+    },
+    {
+      "id": "wordpress.filter-dispatch",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "apply_filters" },
+      "effects": ["hook_dispatch"],
+      "state_scope": "external",
+      "state_access": "read_write",
+      "resource": "wordpress:hooks",
+      "description": "Dispatches callbacks registered for a WordPress filter and returns their transformed value."
+    },
+    {
+      "id": "wordpress.option-read",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "get_option" },
+      "effects": ["database_read"],
+      "state_scope": "external",
+      "state_access": "read",
+      "resource": "wordpress:options",
+      "description": "Reads a WordPress option from persistence or its cache."
+    },
+    {
+      "id": "wordpress.option-write",
+      "matcher": { "node_kind": "call", "match": "exact", "pattern": "update_option" },
+      "effects": ["database_write"],
+      "state_scope": "external",
+      "state_access": "write",
+      "resource": "wordpress:options",
+      "description": "Updates a WordPress option in persistence."
+    }
+  ]
+}
